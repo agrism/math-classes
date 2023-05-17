@@ -91,13 +91,17 @@
 
     let result = {
         tasks: [],
+        isInt: function(n) {
+            return n % 1 === 0;
+        },
         putTask: function () {
 
             this.closeModal();
 
             document.querySelector('#input-div>input').value = '';
 
-            let statement = generateStatement();
+            // let statement = generateStatement();
+            let statement = generateStatementV2();
             let humanStatement = [];
             let systemStatement = [];
 
@@ -114,11 +118,7 @@
             let sysSt = systemStatement.join('');
             let res = this.parse(sysSt);
 
-            function isInt(n) {
-                return n % 1 === 0;
-            }
-
-            if (!isInt(res) || res > 100 || res < 0) {
+            if (!this.isInt(res) || res > 100 || res < 0) {
                 return this.putTask();
             }
 
@@ -385,6 +385,85 @@
         return stack;
     }
 
+    function generateStatementV2(){
+
+        let getResult = function(stack){
+            let statement = [];
+            stack.forEach(function(item){
+                if(item instanceof Object){
+                    statement.push(item.system);
+                } else {
+                    statement.push(item);
+                }
+            })
+
+            return result.parse(statement.join(''))
+        }
+
+        let isResultNormal = function(calculatedResult){
+            if(calculatedResult < 0){
+                return false;
+            }
+            if(calculatedResult > 100){
+                return false;
+            }
+            return result.isInt(calculatedResult);
+        }
+
+        let getSimpleStatement = function (){
+            let tempStack = []
+            tempStack.push(randomInteger(1, 100));
+            tempStack.push(randomOperator());
+            tempStack.push(randomInteger(1, 100));
+            return tempStack;
+        }
+
+        let stack = getSimpleStatement();
+        let calcResult = getResult(stack);
+        if (!isResultNormal(calcResult)) {
+            return generateStatementV2();
+        }
+
+        let needBrackets = randomInteger(1, 2) === 1;
+
+        if(needBrackets){
+            let bufferStack = stack;
+            stack = [];
+            stack.push('(')
+            bufferStack.forEach(function (item){
+                stack.push(item);
+            })
+            stack.push(')')
+        }
+
+        let needThirdArg = randomInteger(1, 2) === 1;
+
+        if(needThirdArg){
+            let addThirdArgAtBegining = randomInteger(1, 2) === 1;
+
+            if(addThirdArgAtBegining){
+                let bufferStack = stack;
+                stack = [];
+                stack.push(randomInteger(0, 100));
+                stack.push(randomOperator());
+                bufferStack.forEach(function (item){
+                    stack.push(item);
+                })
+            } else {
+                stack.push(randomOperator());
+                stack.push(randomInteger(0, 30));
+            }
+        }
+
+        let calcResult2 = getResult(stack);
+        if (!isResultNormal(calcResult2)) {
+            console.log('second statement not normal');
+            return generateStatementV2();
+        }
+
+        return stack;
+    }
+
     window.addEventListener("DOMContentLoaded", (event) => {
 
         result.initData();
@@ -410,7 +489,7 @@
 
             let lastTask = result.lastTask();
 
-            if(lastTask.answers.length <3){
+            if(lastTask && lastTask.answers && lastTask.answers.length <3){
                 result.printResult();
                 result.printLastTaskStatement();
                 return;
