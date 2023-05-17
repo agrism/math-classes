@@ -175,6 +175,10 @@
             });
 
             if (taskAnswerAllreadySubmitted) {
+                if (this.parse(lastTask.statement.system) == val) {
+                    this.showModal(`<h4 style="color: yellow;">Atbildi "${val}"<br>šim uzdevumam jau ir iesniegta,<br>tā ir pareize,<br> pieprasi jaunu <br> uzdevumu!</h4>`);
+                    return;
+                }
                 this.showModal(`<h4 style="color: red;">Atbildi "${val}"<br>šim uzdevumam jau ir iesniegta,<br>tā joprojām nav pareize,<br> saņemies!</h4>`);
                 return;
             }
