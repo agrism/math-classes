@@ -28,6 +28,14 @@
             font-weight: bold;
         }
 
+        @keyframes hideAnimation {
+            to {
+                visibility: hidden;
+                width: 0;
+                height: 0;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -214,8 +222,13 @@
         },
         showModal: function (text) {
             let modal = document.querySelector('#modal');
+
             modal.querySelector('div').innerHTML = text;
             modal.style.display = 'block';
+
+            setTimeout(function(){
+                modal.style.display = 'none';
+            }, 3000);
         },
         closeModalAndCreateNewTask() {
             document.querySelector('#modal').style.display = 'none';
