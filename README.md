@@ -7,6 +7,6 @@
 
 ### TODO
 
-- [ ] add responsive grid for smaller screens
-- [ ] remove code mess in js part
-- [ ] move js part to js file
+- [x] add responsive grid for smaller screens
+- [x] remove code mess in js part
+- [x] move js part to js file
