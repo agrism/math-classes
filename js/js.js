@@ -104,11 +104,6 @@ let result = {
         this.tasks[this.lastTaskIndex()] = lastTask;
         this.printResult();
 
-        console.log({
-            submitted: val,
-            correct: this.parse(lastTask.statement.system),
-        })
-
         if (this.parse(lastTask.statement.system) == val) {
             this.showModal(
                 `<h1 style="color: green">woohoo!</h1> <span>Atbilde pareiza!</span><span> ${lastTask.statement.human} ${val}</span>
@@ -385,7 +380,6 @@ function generateStatementV2(){
 
     let calcResult2 = getResult(stack);
     if (!isResultNormal(calcResult2)) {
-        console.log('second statement not normal');
         return generateStatementV2();
     }
 
