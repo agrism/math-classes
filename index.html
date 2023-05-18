@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Matemātika</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         button {
             margin: 13px;
@@ -21,11 +22,21 @@
         }
 
         button {
-            box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+            box-shadow: rgba(0, 0, 0, 0.35) 0 5px 15px;
         }
 
         .bold {
             font-weight: bold;
+        }
+
+        #clearBtn {
+            position: fixed;
+            right: 10px;
+            bottom: 10px;
+            cursor: pointer;
+            box-shadow: rgba(0, 0, 0, 5.35) 0 5px 15px;
+            padding: 6px;
+            border-radius: 4px;
         }
 
         @keyframes hideAnimation {
@@ -36,32 +47,96 @@
             }
         }
 
+        .container {
+            display: grid;
+            grid-template-columns: auto auto;
+        }
+
+        .task-section {
+            display: grid;
+            grid-template-columns: auto;
+        }
+
+        #statements {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+        }
+
+        @media only screen and (max-width: 900px) {
+            .container {
+                grid-template-columns: auto;
+            }
+            .task-section {
+                grid-template-columns: auto auto auto;
+            }
+        }
+
+        @media only screen and (max-width: 600px) {
+            .task-section {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .task-section > div:nth-child(3) {
+                grid-column-start: span 2;
+                /*background-color: magenta;*/
+            }
+        }
+
+        @media only screen and (max-width: 430px) {
+            .task-section {
+                grid-template-columns: 1fr;
+            }
+
+            .task-section > div:nth-child(3) {
+                grid-column-start: 1;
+            }
+
+            #statements {
+                grid-template-columns: 3fr 1fr 1fr;
+            }
+
+
+        }
+
+        #answer {
+            width: 70%;
+        }
+
+        #input-div, #task {
+            margin-top: 13px;
+        }
+
+        #input-div {
+            display: grid;
+        }
+
     </style>
 </head>
 <body>
 
 <div id="modal"
-     style="position: fixed; top: 10px;right: 10px;display: none;width: 300px;height: 300px;box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;opacity: 0.9">
+     style="position: fixed; top: 10px;right: 10px;display: none;width: 300px;height: 300px;box-shadow: rgba(0, 0, 0, 0.35) 0 5px 15px;opacity: 0.9">
     <span style="position: absolute;top: 5px; right: 9px; cursor: pointer; font-size: 30px;font-weight: bold;color: #000;">&times;</span>
     <div style="display: grid; justify-items: center;align-items: center;background-color: white ;height: 300px;font-size: 20px;text-align: center;">
 
     </div>
 </div>
 
-<div id="clearBtn"
-     style="position: fixed; right: 10px; bottom: 10px; cursor: pointer;box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;">
+<div id="clearBtn">
     CLEAR
 </div>
 
-<div class="container" style="display: grid;grid-template-columns: 1fr 1fr;">
+<div class="container">
     <div style="background-color: yellow;">
-        <div style="display: grid;grid-template-columns: auto auto auto;">
+        <div class="task-section">
             <div id="task" style="display: none;font-size: 20px;"></div>
             <div id="input-div" style="display: none">
-                <input type="text">
+                <div>
+                    <input id="answer" type="text">
+                </div>
             </div>
-            <button id="generate">Sakt!</button>
             <div style="display: grid">
+                <button id="generate">Sakt!</button>
                 <button id="submit" style="display: none">Iesniegt</button>
                 <button id="next" style="display: none">Gribu jaunu uzdevumu!</button>
                 <button id="get-me-away" style="display: none">Mizošu kartupeļus</button>
@@ -77,7 +152,7 @@
         <div id="score" style="color: green;font-weight: bold"></div>
 
         <div style="grid-column: 1/3;">
-            <div id="statements" style="display: grid; grid-template-columns: auto auto auto;">
+            <div id="statements">
                 <div class="bold">Uzdevumi</div>
                 <div class="bold">Atbildes</div>
                 <div class="bold">Atbilde pareiza?</div>
@@ -160,7 +235,7 @@
             return this.tasks.length;
         },
         submitAnswerToLastTask: function () {
-            let val = document.querySelector('#input-div > input').value;
+            let val = document.querySelector('#input-div  input').value;
 
             if (!val) {
                 this.showModal('<span style="color: red;">Atbildes vērtība<br>nav ievadīta,<br> saņemies!</span>');
@@ -183,7 +258,7 @@
             });
 
             if (taskAnswerAllreadySubmitted) {
-                if (this.parse(lastTask.statement.system) == val) {
+                if (this.parse(lastTask.statement.system) === val) {
                     this.showModal(`<h4 style="color: mediumseagreen;">Atbildi "${val}"<br>šim uzdevumam jau ir iesniegta,<br>tā ir pareize,<br> pieprasi jaunu <br> uzdevumu!</h4>`);
                     return;
                 }
@@ -195,13 +270,13 @@
             this.tasks[this.lastTaskIndex()] = lastTask;
             this.printResult();
 
-            if (this.parse(lastTask.statement.system) == val) {
+            if (this.parse(lastTask.statement.system) === val) {
                 this.showModal(
                     `<h1 style="color: green">woohoo!</h1> <span>Atbilde pareiza!</span><span> ${lastTask.statement.human} ${val}</span>
 <button onclick="result.closeModalAndCreateNewTask()">Gribu jaunu uzdevumu!</button>`
                 );
                 document.querySelector('#task').style.display = 'none';
-                document.querySelector('#input-div>input').style.display = 'none';
+                document.querySelector('#input-div input').style.display = 'none';
                 document.querySelector('#submit').style.display = 'none';
             } else {
                 this.showModal(
@@ -258,10 +333,9 @@
 
                 task.answers.forEach((answer) => {
                     if (!isAnswerCorrect) {
-                        isAnswerCorrect = this.parse(task.statement.system) == answer;
+                        isAnswerCorrect = this.parse(task.statement.system) === answer;
                     }
                 })
-
 
                 const div1 = document.createElement('div');
                 div1.innerHTML = task.answers.join(',');
@@ -270,7 +344,6 @@
                 const div2 = document.createElement('div');
                 div2.innerHTML = task.answers.length ? (isAnswerCorrect ? '<span style="color: green">ja</span>' : '<span style="color: red">ne</span>') : '';
                 statements.appendChild(div2)
-
 
                 if (isAnswerCorrect) {
                     correctAnswers++;
@@ -323,7 +396,6 @@
                 this.showModal(`<h4 style="color: green;">Storage cleared!</h4>`);
             }
 
-
             localStorage.setItem('tasks', JSON.stringify([]));
             this.tasks = [];
             this.printResult();
@@ -338,7 +410,6 @@
                 hash = ((hash << 5) - hash) + char;
                 hash = hash & hash;
             }
-
 
             return hash;
         }
@@ -357,11 +428,9 @@
     function generateStatement() {
         let stack = [];
 
-        // stack.push('(');
         stack.push(randomInteger(1, 20));
         stack.push(randomOperator());
         stack.push(randomInteger(1, 20));
-        // stack.push(')');
 
         if (randomInteger(1, 2) === 1) {
             stack.push(randomOperator());
@@ -505,7 +574,7 @@
         const generateTaskBtn = document.querySelector('button#generate');
         const submitBtn = document.querySelector('button#submit');
         const inputDiv = document.querySelector('#input-div');
-        const input = document.querySelector('#input-div > input');
+        const input = document.querySelector('#input-div input');
         const getMeAwayBtn = document.querySelector('#get-me-away');
         const nextBtn = document.querySelector('#next');
         const closeBtn = document.querySelector('#modal > span');
@@ -529,10 +598,6 @@
             result.putTask();
         });
 
-        input.addEventListener('keyup', function (event) {
-
-        });
-
         submitBtn.addEventListener('click', function (event) {
             result.submitAnswerToLastTask();
         })
@@ -542,7 +607,6 @@
             modal.querySelector('div').innerHTML = 'Game over!';
             modal.style.display = 'block';
         })
-
 
         nextBtn.addEventListener('click', function (event) {
             result.putTask();
