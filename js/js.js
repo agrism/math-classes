@@ -172,7 +172,7 @@ let result = {
 
             task.answers.forEach((answer) => {
                 if (!isAnswerCorrect) {
-                    isAnswerCorrect = this.parse(task.statement.system) === answer;
+                    isAnswerCorrect = this.parse(task.statement.system) == answer;
                 }
             })
 
